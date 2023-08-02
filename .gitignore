@@ -1,0 +1,10 @@
+*.pyc
+
+venv/
+env/
+.env
+.idea/
+.vscode/
+
+secrets.txt
+credentials.json
