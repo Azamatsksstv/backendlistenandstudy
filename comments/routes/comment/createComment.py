@@ -16,7 +16,7 @@ class CommentListCreateAPIView(APIView):
     def get(self, request, course_id, lesson_id):
         course = get_object_or_404(Course, id=course_id)
         lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
-        comments = Comment.objects.filter(lesson=lesson)
+        comments = Comment.objects.filter(lesson=lesson, parent__isnull=True)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
