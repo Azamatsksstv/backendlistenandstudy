@@ -1,4 +1,7 @@
 from rest_framework import permissions
+
+import accounts.choices
+from courses.models import Course
 from . import choices
 
 
@@ -12,25 +15,23 @@ class IsStudent(permissions.BasePermission):
         return request.user.user_type == choices.UserTypeChoices.Student
 
 
-class IsAdminOrReadOnly(permissions.BasePermission):
+class IsEnrolledInCourse(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True  # Разрешить GET, HEAD, OPTIONS запросы всем
+        course_id = view.kwargs.get('course_id')
+        user = request.user
 
-        # Проверить, является ли пользователь администратором
-        return request.user.is_superuser
+        if user.is_authenticated and user.courses.filter(id=course_id).exists():
+            return True
+        return False
 
 
-class IsTeacherOrReadOnly(permissions.BasePermission):
+class IsTeacherOfCourse(permissions.BasePermission):
     def has_permission(self, request, view):
-        if request.method in permissions.SAFE_METHODS:
-            return True  # Разрешить GET, HEAD, OPTIONS запросы всем
+        course_id = view.kwargs.get('course_id')
+        user = request.user
 
-        # Проверить, является ли пользователь учителем
-        return request.user.user_type == 'Teacher'
-
-
-class IsStudentReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        # Разрешить только GET, HEAD, OPTIONS запросы студентам
-        return request.method in permissions.SAFE_METHODS and request.user.user_type == 'Student'
+        if user.is_authenticated and user.user_type == accounts.choices.UserTypeChoices.Teacher:
+            course = Course.objects.get(id=course_id)
+            if course.teacher == user:
+                return True
+        return False

@@ -2,14 +2,14 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsStudent, IsTeacher
+from accounts.permissions import IsTeacherOfCourse, IsEnrolledInCourse
 
 from courses.models import Lesson
 from courses.serializers.lesson import LessonDetailSerializer
 
 
 class LessonDetailView(APIView):
-    permission_classes = [IsAuthenticated, (IsStudent | IsTeacher)]
+    permission_classes = [IsAuthenticated, (IsEnrolledInCourse | IsTeacherOfCourse)]
 
     def get(self, request, course_id, lesson_id):
         lesson = get_object_or_404(Lesson, id=lesson_id, course_id=course_id)
