@@ -19,9 +19,6 @@ class RegisterAPI(APIView):
                     'message': 'Registration successfully check email',
                     'data': serializer.data,
                 })
-            print("efwlk")
-            print(serializer.is_valid())
-
             return Response({
                 'status': 400,
                 'message': 'Something went wrong',
